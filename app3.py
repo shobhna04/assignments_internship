@@ -1,24 +1,39 @@
 import streamlit as st
 st.title("THE MULTIVERSE OF CHATBOTS")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+         st.write(msg["content"])
 personality=st.selectbox("who do u want to talk to ",[
-    "ms dhoni fan","virat kohli fan ","rohit sharma fan",])
+    "a polite friend","an angry man  ","a cool genz","a millenial","a genalpha"])
 
 from google import genai
 import os
 from dotenv import load_dotenv
 load_dotenv()
 client=genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-user_message=st.text_input("say something:")
+user_message=st.chat_input("say something:")
+with st.chat_message("assistant"):
+    st.write("Hi,Im' your chatbot")
 
-if st.button("SEND"):
-    if user_message:
+if user_message:
+        with st.chat_message("user"):
+             st.write(user_message)
+        st.session_state.messages.append({"role": "user", "content": user_message})
         ai_instructions=f"you are acting as {personality}.Respond to the message sent by user staying completely in character:{user_message}"
         with st.spinner("connecting to the multiverse!........."):
-            response=client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=ai_instructions
-            )
-            st.success("mesaage received!")
-            st.write(response.text)
-    else:
+            try:
+                response=client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=ai_instructions
+                )
+                st.success("mesaage received!")
+                with st.chat_message("assistant"):
+                    st.write(response.text)
+                    st.session_state.messages.append({"role": "assistant", "content": response.text})
+            except Exception as e:
+                st.error("The AI is a bit busy right now — please try again in a moment.")
+
+else:
         st.warning("please type a message first")
