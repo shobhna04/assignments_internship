@@ -1,5 +1,5 @@
 import streamlit as st
-st.title("THE MULTIVERSE OF CHATBOTS")
+st.title("🤖THE MULTIVERSE OF CHATBOTS🤖")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 for msg in st.session_state.messages:
